@@ -1,25 +1,24 @@
 from telegram import Update
 from telegram.ext import ContextTypes
-from services.state import reply_mode_map
+from database.base import AsyncSessionLocal
+from database.crud import set_reply_mode
+from database.models import ReplyModeEnum
+
 
 async def button_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()
-
-    data = query.data
     try:
-        prefix, msg_id_str, mode = data.split(":")
+        _, msg_id_str, mode_str = query.data.split(":")
         msg_id = int(msg_id_str)
+        mode = ReplyModeEnum(mode_str)
     except Exception:
-        await query.edit_message_text("Ошибка обработки выбора режима ответа.")
+        await query.edit_message_text("Ошибка обработки выбора.")
         return
 
-    if prefix != "reply_mode" or mode not in ("thread", "simple"):
-        await query.edit_message_text("Неверный выбор.")
-        return
+    async with AsyncSessionLocal() as session:
+        await set_reply_mode(session, msg_id, mode)
 
-    reply_mode_map[msg_id] = mode
-    mode_text = "в треде (reply)" if mode == "thread" else "отдельным сообщением"
     await query.edit_message_text(
-        f"Выбран режим ответа: {mode_text}\nТеперь ответьте на данное сообщение в этом чате."
+        f"Выбран режим ответа: {'в треде' if mode == ReplyModeEnum.thread else 'отдельным сообщением'}.\nТеперь ответьте на данное сообщение."
     )

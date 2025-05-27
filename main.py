@@ -4,8 +4,11 @@ from handlers.user import user_message_handler, start_command
 from handlers.manager import manager_reply_handler
 from handlers.callbacks import button_callback
 from logs import logger
+from database.base import engine, init_models
 
 async def on_startup(app: Application):
+    await init_models(engine)
+    logger.info("🤖 Все таблицы созданы в БД")
     logger.info("🤖 Бот техподдержки запущен!")
 
 def main():
