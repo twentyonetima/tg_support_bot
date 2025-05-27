@@ -1,6 +1,6 @@
 from telegram.ext import Application, CommandHandler, MessageHandler, CallbackQueryHandler, filters
 from config import BOT_TOKEN, SUPPORT_CHAT_ID
-from handlers.user import user_message_handler, start_command
+from handlers.user import user_message_handler, start_command, language_button_handler
 from handlers.manager import manager_reply_handler
 from handlers.callbacks import button_callback
 from logs import logger
@@ -15,6 +15,7 @@ def main():
     app = Application.builder().token(BOT_TOKEN).build()
 
     app.add_handler(CommandHandler("start", start_command))
+    app.add_handler(CallbackQueryHandler(language_button_handler, pattern=r"^set_lang:"))
     app.add_handler(MessageHandler(
         filters.TEXT & (~filters.Chat(chat_id=SUPPORT_CHAT_ID)),
         user_message_handler

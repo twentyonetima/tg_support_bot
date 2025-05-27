@@ -4,13 +4,33 @@ from config import SUPPORT_CHAT_ID
 from database.base import AsyncSessionLocal
 from database.crud import save_message_map
 from services.utils import get_user_display_name
+from services.i18n import get_user_language, get_text, language_selection_markup
 
 
 async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text("Здравствуйте! Напишите ваш вопрос, и мы скоро ответим.")
+    user_lang = get_user_language(update)
+    greeting = get_text(user_lang, "greeting_select")
+    keyboard = language_selection_markup()
+    await update.message.reply_text(greeting, reply_markup=keyboard)
+
+
+async def language_button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer()
+    data = query.data
+    if not data.startswith("set_lang:"):
+        await query.edit_message_text("Ошибка выбора языка.")
+        return
+
+    lang = data.split(":")[1]
+    context.user_data["lang"] = lang
+
+    prompt = get_text(lang, "prompt_question")
+    await query.edit_message_text(prompt)
 
 
 async def user_message_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    lang = context.user_data.get("lang", get_user_language(update))
     msg = update.effective_message
     user = msg.from_user
     user_id = user.id
