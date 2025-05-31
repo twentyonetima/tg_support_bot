@@ -53,7 +53,12 @@ source venv/bin/activate
 pip install -r rq.txt
 ```
 
-3. Постройте и запустите контейнеры через Docker Compose:
+3. Создайте новый support чат с ботом, в котором находят менеджеры и замените SUPPORT_CHAT_ID в .env или вступите в уже созданный чат для менеджеров:
+```bash
+https://t.me/+g6Qz_HjjO2tlMmRi 
+```
+
+4. Постройте и запустите контейнеры через Docker Compose:
 
 ```bash
 docker-compose up --build
@@ -61,10 +66,6 @@ docker-compose up --build
 
 После старта бот автоматически создаст нужные таблицы в базе данных и начнет принимать сообщения.
 
-4. Создайте новый support чат с ботом, в котором находят менеджеры и замените SUPPORT_CHAT_ID в .env или вступите в уже созданный чат для менеджеров:
-```bash
-https://t.me/+g6Qz_HjjO2tlMmRi 
-```
 ---
 
 ## Использование
